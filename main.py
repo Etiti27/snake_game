@@ -1,39 +1,45 @@
-import random
-import turtle
-from turtle import Turtle
+import time
+from turtle import Screen, Turtle
+from snake import Snake
+from food import Food
+from score import Score
 
+snake = Snake()
+screen = Screen()
+food = Food()
+score = Score()
+screen.bgcolor('black')
+screen.title('My Snake Game')
+screen.setup(width=600, height=600)
+screen.tracer(0)
+screen.listen()
+screen.onkey(snake.up, 'Up')
+screen.onkey(snake.down, 'Down')
+screen.onkey(snake.left_side, 'Left')
+screen.onkey(snake.right_side, 'Right')
 
-screen=turtle.Screen()
-prediction = screen.textinput(title='Predict', prompt="who will win this race? 'red', 'blue', 'green', 'grey', 'brown'or 'black' ")
+is_game_on = True
 
-colors=['red', 'blue', 'green', 'grey', 'brown','black']
-timmy_position=[-40, -10, 20, 50, 80,110]
-new_turtle=[]
-is_race_on=False
-for index in range(0, len(colors)):
-    timmy = Turtle(shape='turtle')
-    timmy.penup()
-    timmy.goto(x=-270, y=timmy_position[index])
-    timmy.color(colors[index])
-    new_turtle.append(timmy)
+while is_game_on:
+    screen.update()
 
-if prediction:
-    is_race_on=True
-while is_race_on:
+    snake.move()
+    time.sleep(1)
+    if snake.head.distance(food) < 15:
+        print('collusion occurred')
+        food.refresh_food_location()
+        snake.extend()
+        score.update_score()
 
-    for tim in new_turtle:
-        movement = random.randint(0, 10)
-        tim.forward(movement)
-        if tim.xcor() >270:
-            is_race_on=False
-            winning_color=tim.pencolor()
-            if winning_color == prediction.lower():
-                print(f'you won!, the winning turtle is "{winning_color}" turtle')
-            else:
-                print(f'you lost!, the winning turtle is "{winning_color}" turtle')
+    if snake.head.xcor() > 280 or snake.head.xcor() < -280 or snake.head.ycor() > 280 or snake.head.ycor() < -280:
+        print('Game over')
+        is_game_on = False
+        score.game_over()
 
+    for segment in snake.total_snake[1:]:
 
-screen.setup(height=500, width=600)
+        if snake.head.distance(segment) < 10:
+            is_game_on = False
+            score.game_over()
+
 screen.exitonclick()
-
-
